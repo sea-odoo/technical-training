@@ -1,0 +1,129 @@
+<odoo>
+    <menuitem id="openacademy_main_menu" string="OpenAcademy" web_icon="openacademy,views/icon.jpeg"/>
+    
+    <record id="course_list" model="ir.ui.view">
+        <field name="name">course.list.view</field>
+        <field name="model">openacademy.course</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="responsible_id"/>
+                <field name="level"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="course_form" model="ir.ui.view">
+        <field name="name">course.form.view</field>
+        <field name="model">openacademy.course</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="level" widget="statusbar" options="{'clickable':'1'}"/>
+                </header>
+                <sheet>
+                    <group><h1><field name="name"/></h1>
+                    <field name="responsible_id" attrs="{'required':[('name','!=',False)]}"/></group>
+                    
+                    
+                    <notebook>
+                        <page name="sessions" string="Sessions">
+                            <field name="session_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="instructor_id"/>
+                                    <field name="start_date"/>
+                                    <field name="taken_seats" widget="progressbar"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet> 
+            </form>
+        </field>
+    </record>
+    
+    <record id="course_search_view" model="ir.ui.view">
+        <field name="name">course.form.view</field>
+        <field name="model">openacademy.course</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="responsible_id"/>
+                
+                <filter name="filter_easy" string="Easy" domain="[('level','=','1')]"/>
+                <filter name="filter_medium" string="Medium" domain="[('level','=','2')]"/>
+                <filter name="filter_hard" string="Hard" domain="[('level','=','3')]"/>
+                <separator/>
+                <filter name="group_level" string="Difficulty" context="{'group_by':'level'}"/>
+                <filter name="group_teacher" string="Teacher" context="{'group_by':'responsible_id'}"/>
+            </search>
+        </field>
+    </record>
+    
+    
+    <record id="session_list" model="ir.ui.view">
+        <field name="name">session.list.view</field>
+        <field name="model">openacademy.session</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="instructor_id"/>
+                <field name="course_id"/>
+                <field name="attendee_ids" widget="many2many_tags"/>
+                <field name="seats"/>
+                <field name="taken_seats" widget="progressbar"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="session_form" model="ir.ui.view">
+        <field name="name">session.form.view</field>
+        <field name="model">openacademy.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" options="{'clickable':'1'}"/>
+                </header>
+                <sheet>
+                    <group><h1><field name="name"/></h1>
+                    <field name="instructor_id" attrs="{'required': [('state', '=', 'draft')],'readonly':[('state','!=','draft')]}"/>
+                    <field name="course_id" attrs="{'readonly':[('state','!=','draft')]}"/></group>
+
+                    <notebook>
+                        <page name="partners" string="Partners" attrs="{'invisible':[('state','=','draft')], 'readonly': [('state','=','done')]}">
+                            <field name="attendee_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="instructor"/>
+
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet> 
+            </form>
+        </field>
+    </record>
+    
+    <record id="course_action" model="ir.actions.act_window">
+        <field name="name">Courses</field>
+        <field name="res_model">openacademy.course</field>
+        <field name="view_mode">tree,form,graph,pivot,kanban</field>
+    </record>
+    
+    <record id="session_action" model="ir.actions.act_window">
+        <field name="name">Sessions</field>
+        <field name="res_model">openacademy.session</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    
+    <menuitem id="openacademy_courses_menu" string="Courses" 
+parent="openacademy.openacademy_main_menu" action="course_action"/>
+    
+    <menuitem id="openacademy_sessions_menu" string="Sessions" 
+parent="openacademy.openacademy_main_menu" action="session_action"/>
+    
+    
+</odoo>
